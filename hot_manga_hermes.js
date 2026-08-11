@@ -27,15 +27,15 @@ class HotManga extends ComicSource {
     }
 
 
-    name = "hot_manga_unified"
+    name = "绅士漫画(Hermes)"
 
-    key = "hot_manga_unified"
+    key = "hot_manga_hermes"
 
     version = "1.0.0"
 
     minAppVersion = "1.6.0"
 
-    url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/hot_manga_unified.js";
+    url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/hot_manga_hermes.js";
 
     static defaultImageQuality = "1500"
 

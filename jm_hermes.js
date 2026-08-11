@@ -22,10 +22,10 @@ class JM extends ComicSource {
     // Note: The fields which are marked as [Optional] should be removed if not used
 
     // name of the source
-    name = "jm_unified"
+    name = "禁漫天堂(Hermes)"
 
     // unique id of the source
-    key = "jm_unified"
+    key = "jm_hermes"
 
     version = "1.4.0"
 
@@ -36,7 +36,7 @@ class JM extends ComicSource {
     static jmPkgName = "com.example.app"
 
     // update url
-    url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/jm_unified.js"
+    url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/jm_hermes.js"
 
     dailyCheckInInProgress = false
 

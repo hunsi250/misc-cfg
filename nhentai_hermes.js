@@ -23,17 +23,17 @@ class Nhentai extends ComicSource {
     // Note: The fields which are marked as [Optional] should be removed if not used
 
     // name of the source
-    name = "nhentai_unified"
+    name = "nhentai(Hermes)"
 
     // unique id of the source
-    key = "nhentai_unified"
+    key = "nhentai_hermes"
 
     version = "1.1.0"
 
     minAppVersion = "1.0.0"
 
     // update url
-    url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/nhentai_unified.js"
+    url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/nhentai_hermes.js"
 
     baseUrl = "https://nhentai.net"
     apiBaseUrl = "https://nhentai.net/api/v2"

@@ -27,7 +27,7 @@ class JM extends ComicSource {
     // unique id of the source
     key = "jm_hermes"
 
-    version = "1.4.3"
+    version = "1.4.4"
 
     minAppVersion = "1.5.0"
 

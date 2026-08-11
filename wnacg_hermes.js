@@ -28,7 +28,7 @@ class Wnacg extends ComicSource {
     // unique id of the source
     key = "wnacg_hermes"
 
-    version = "1.0.7"
+    version = "1.0.8"
 
     minAppVersion = "1.0.0"
 

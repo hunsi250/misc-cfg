@@ -31,7 +31,7 @@ class HotManga extends ComicSource {
 
     key = "hot_manga_hermes"
 
-    version = "1.0.0"
+    version = "1.0.1"
 
     minAppVersion = "1.6.0"
 

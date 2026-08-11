@@ -1015,12 +1015,12 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.3""1.1.2";
+  version = "1.1.3";
 
   minAppVersion = "1.4.6";
 
   // update url
-  url = "https://uhxvvf0u.de5.net/update/hitomi_hermes.js";
+  url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/hitomi_hermes.js";
 
   galleryCache = [];
   categoryResultCache = undefined;

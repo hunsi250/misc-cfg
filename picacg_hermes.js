@@ -24,7 +24,7 @@ class Picacg extends ComicSource {
 
     key = "picacg_hermes"
 
-    version = "1.0.7""1.0.6"
+    version = "1.0.7"
 
     minAppVersion = "1.0.0"
 

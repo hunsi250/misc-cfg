@@ -31,7 +31,7 @@ class HotManga extends ComicSource {
 
     key = "hot_manga_hermes"
 
-    version = "1.0.1"
+    version = "1.0.2"
 
     minAppVersion = "1.6.0"
 
@@ -65,6 +65,43 @@ class HotManga extends ComicSource {
     }
 
     account = {
+        // 网页登录 (webview): 绕过 API 登录限流 (210)
+        loginWithWebview: {
+            url: "https://www.manga2026.com/web/login/loginByAccount",
+            checkStatus: (url, title) => {
+                // 登录成功后 SPA 会跳转离开登录页
+                return url.includes("/web") && !url.includes("login")
+            },
+            onLoginSuccess: async () => {
+                // 1. 先从 localStorage 提取 token (网页 SPA 通常存这里)
+                let ls = this.loadData('_localStorage') || {}
+                for (let k of Object.keys(ls)) {
+                    let v = ls[k]
+                    if (typeof v !== 'string' || v.length < 10) continue
+                    try {
+                        let obj = JSON.parse(v)
+                        if (obj && typeof obj === 'object' && obj.token) {
+                            this.saveData('token', String(obj.token))
+                            return
+                        }
+                    } catch (e) {}
+                    if (k.toLowerCase().includes('token')) {
+                        this.saveData('token', v)
+                        return
+                    }
+                }
+                // 2. 再从 cookies 提取
+                let cookies = await Network.getCookies("https://www.manga2026.com")
+                for (let c of cookies) {
+                    let n = (c.name || "").toLowerCase()
+                    if (n.includes('token') || n.includes('session')) {
+                        this.saveData('token', c.value)
+                        return
+                    }
+                }
+            },
+        },
+
         login: async (account, pwd) => {
             // 210 = 访问过于频繁(限流): 等待后自动重试 (最多2次)
             for (let attempt = 0; attempt < 2; attempt++) {

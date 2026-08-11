@@ -66,23 +66,39 @@ class HotManga extends ComicSource {
 
     account = {
         login: async (account, pwd) => {
-            let salt = randomInt(1000, 9999)
-            let base64 = Convert.encodeBase64(Convert.encodeUtf8(`${pwd}-${salt}`))
-            let res = await Network.post(
-                `${this.apiUrl}/api/v3/login`,
-                {
-                    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-                },
-                `username=${account}&password=${base64}&salt=${salt}&source=Official&version=2.2.0&platform=3`
-            );
-            if (res.status === 200) {
-                let data = JSON.parse(res.body)
-                let token = data.results.token
-                this.saveData('token', token)
-                return "ok"
-            } else {
+            // 210 = 访问过于频繁(限流): 等待后自动重试 (最多2次)
+            for (let attempt = 0; attempt < 2; attempt++) {
+                let salt = randomInt(1000, 9999)
+                let base64 = Convert.encodeBase64(Convert.encodeUtf8(`${pwd}-${salt}`))
+                let res = await Network.post(
+                    `${this.apiUrl}/api/v3/login`,
+                    {
+                        "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+                    },
+                    `username=${account}&password=${base64}&salt=${salt}&source=Official&version=2.2.0&platform=3`
+                );
+                if (res.status === 200) {
+                    let data = JSON.parse(res.body)
+                    let token = data.results.token
+                    this.saveData('token', token)
+                    return "ok"
+                }
+                if (res.status === 210) {
+                    let waitTime = 40000 // 默认等 40s
+                    try {
+                        let responseBody = JSON.parse(res.body);
+                        if (responseBody.message && responseBody.message.includes("Expected available in")) {
+                            let match = responseBody.message.match(/(\d+)\s*seconds/);
+                            if (match && match[1]) waitTime = parseInt(match[1]) * 1000;
+                        }
+                    } catch (e) {}
+                    console.log(`登录过于频繁, 等待 ${waitTime / 1000}s 后重试`);
+                    await new Promise((resolve) => setTimeout(resolve, waitTime));
+                    continue;
+                }
                 throw `Invalid Status Code ${res.status}`
             }
+            throw "登录频繁被限流, 请稍等几分钟再试 (210)"
         },
 
         logout: () => {

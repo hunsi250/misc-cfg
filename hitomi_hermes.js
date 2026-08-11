@@ -193,7 +193,8 @@ async function get_url_at_range(url, range) {
 async function get_node_at_address(field, address) {
   if (!galleries_index_version)
     throw new Error("galleries_index_version is not set");
-  const url = "https://uhxvvf0u.de5.net/update/hitomi_hermes.js" +
+  const url =
+    "https://" +
     domain +
     "/" +
     "galleriesindex/galleries." +
@@ -1020,7 +1021,7 @@ class Hitomi extends ComicSource {
   minAppVersion = "1.4.6";
 
   // update url
-  url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/hitomi_hermes.js";
+  url = "https://uhxvvf0u.de5.net/update/hitomi_hermes.js";
 
   galleryCache = [];
   categoryResultCache = undefined;

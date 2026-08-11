@@ -27,7 +27,7 @@ class JM extends ComicSource {
     // unique id of the source
     key = "jm_hermes"
 
-    version = "1.4.0"
+    version = "1.4.1""1.4.0"
 
     minAppVersion = "1.5.0"
 
@@ -36,7 +36,7 @@ class JM extends ComicSource {
     static jmPkgName = "com.example.app"
 
     // update url
-    url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/jm_hermes.js"
+    url = "https://uhxvvf0u.de5.net/update/jm_hermes.js"
 
     dailyCheckInInProgress = false
 

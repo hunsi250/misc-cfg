@@ -28,12 +28,12 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.0"
+    version = "1.2.1""1.2.0"
 
     minAppVersion = "1.5.3"
 
     // update url
-    url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/ehentai_hermes.js"
+    url = "https://uhxvvf0u.de5.net/update/ehentai_hermes.js"
 
     /**
      * cached api key

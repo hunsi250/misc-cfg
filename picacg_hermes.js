@@ -24,11 +24,11 @@ class Picacg extends ComicSource {
 
     key = "picacg_hermes"
 
-    version = "1.0.6"
+    version = "1.0.7""1.0.6"
 
     minAppVersion = "1.0.0"
 
-    url = "https://raw.githubusercontent.com/hunsi250/misc-cfg/main/picacg_hermes.js"
+    url = "https://uhxvvf0u.de5.net/update/picacg_hermes.js"
 
     static defaultApiUrl = "https://picaapi.picacomic.com"
 

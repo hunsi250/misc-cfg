@@ -1,4 +1,24 @@
 class JM extends ComicSource {
+    // ===== 统一搜索语法解析 (ehentai 风格) =====
+    // 识别: artist:"xxx" / parody:"xxx" / tag:"xxx" / language:xx / group:"xxx" / character:"xxx"
+    // 返回: { fields: {字段: [值...]}, plain: 剩余纯关键词 }
+    parseSearchSyntax(keyword) {
+        const fields = {};
+        const re = /(artist|parody|tag|language|group|character)\s*:\s*("([^"]*)"|([^\s]+))/g;
+        let m;
+        const used = [];
+        while ((m = re.exec(keyword)) !== null) {
+            const field = m[1].toLowerCase();
+            const value = m[3] !== undefined ? m[3] : m[4];
+            if (!fields[field]) fields[field] = [];
+            fields[field].push(value);
+            used.push([m.index, m.index + m[0].length]);
+        }
+        let plain = keyword;
+        for (let i = used.length - 1; i >= 0; i--) plain = plain.slice(0, used[i][0]) + plain.slice(used[i][1]);
+        plain = plain.replace(/\s+/g, " ").trim();
+        return { fields, plain };
+    }
     // Note: The fields which are marked as [Optional] should be removed if not used
 
     // name of the source

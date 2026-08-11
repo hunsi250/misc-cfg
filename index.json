@@ -3,36 +3,36 @@
     "name": "nhentai(Hermes)",
     "fileName": "nhentai_hermes.js",
     "key": "nhentai_hermes",
-    "version": "1.1.2"
+    "version": "1.1.3"
   },
   {
     "name": "hitomi(Hermes)",
     "fileName": "hitomi_hermes.js",
     "key": "hitomi_hermes",
-    "version": "1.1.4"
+    "version": "1.1.5"
   },
   {
     "name": "ehentai(Hermes)",
     "fileName": "ehentai_hermes.js",
     "key": "ehentai_hermes",
-    "version": "1.2.2"
+    "version": "1.2.3"
   },
   {
     "name": "禁漫天堂(Hermes)",
     "fileName": "jm_hermes.js",
     "key": "jm_hermes",
-    "version": "1.4.2"
+    "version": "1.4.3"
   },
   {
     "name": "picacg(Hermes)",
     "fileName": "picacg_hermes.js",
     "key": "picacg_hermes",
-    "version": "1.0.8"
+    "version": "1.0.9"
   },
   {
     "name": "绅士漫画(Hermes)",
     "fileName": "wnacg_hermes.js",
     "key": "wnacg_hermes",
-    "version": "1.0.6"
+    "version": "1.0.7"
   }
 ]

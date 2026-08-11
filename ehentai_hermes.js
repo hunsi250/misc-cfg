@@ -28,7 +28,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.2"
+    version = "1.2.3"
 
     minAppVersion = "1.5.3"
 

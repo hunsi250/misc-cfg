@@ -28,14 +28,15 @@ class Wnacg extends ComicSource {
     // unique id of the source
     key = "wnacg_hermes"
 
-    version = "1.0.8"
+    version = "1.0.9"
 
     minAppVersion = "1.0.0"
 
     // update url
     url = "https://uhxvvf0u.de5.net/update/wnacg_hermes.js"
 
-    static domains = [];
+    static domains = ["www.wnacg.com"];
+    static UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
     get baseUrl() {
         let selection = this.loadSetting('domainSelection')
@@ -60,7 +61,14 @@ class Wnacg extends ComicSource {
     }
 
     overwriteDomains(domains) {
-        if (domains.length != 0) Wnacg.domains = domains
+        if (domains.length != 0) {
+            // 主站优先: 镜像域名 (wnacg01/02.link) 无登录接口
+            let base = ['www.wnacg.com']
+            for (let d of domains) {
+                if (!base.includes(d)) base.push(d)
+            }
+            Wnacg.domains = base
+        }
     }
 
     // [Optional] account related
@@ -72,21 +80,39 @@ class Wnacg extends ComicSource {
          * @returns {Promise<any>}
          */
         login: async (account, pwd) => {
-            let res = await Network.post(
-                `${this.baseUrl}/users-check_login.html`,
-                {
-                    'content-type': 'application/x-www-form-urlencoded'
-                },
-                `login_name=${encodeURIComponent(account)}&login_pass=${encodeURIComponent(pwd)}`
-            )
-            if (res.status !== 200) {
-                throw 'Login failed'
+            // 登录接口只在主站存在; 镜像域名 (wnacg01/02.link 等) 无登录接口(404)
+            // 策略: 先试当前域名, 404 则自动切换到主站 www.wnacg.com
+            let cur = this.baseUrl.replace(/^https?:\/\//, '')
+            let candidates = [cur, 'www.wnacg.com']
+            for (let dom of candidates) {
+                let url = `https://${dom}/users-check_login.html`
+                try {
+                    let res = await Network.post(
+                        url,
+                        {
+                            'content-type': 'application/x-www-form-urlencoded',
+                            'user-agent': Wnacg.UA
+                        },
+                        `login_name=${encodeURIComponent(account)}&login_pass=${encodeURIComponent(pwd)}`
+                    )
+                    if (res.status === 404) continue
+                    if (res.status !== 200) {
+                        throw 'Login failed'
+                    }
+                    let json = JSON.parse(res.body)
+                    if (json['html'] && json['html'].includes('登錄成功')) {
+                        if (dom !== cur) {
+                            throw '登录接口已在主站验证成功, 但当前浏览域名是镜像站, 不支持账号功能。请在源设置→域名选择中切换到 www.wnacg.com 后重新登录'
+                        }
+                        return 'ok'
+                    }
+                    throw 'Login failed'
+                } catch (e) {
+                    if (typeof e === 'string' && e.includes('主站')) throw e
+                    continue
+                }
             }
-            let json = JSON.parse(res.body)
-            if (json['html'].includes('登錄成功')) {
-                return 'ok'
-            }
-            throw 'Login failed'
+            throw 'Login failed: 请检查账号密码; 若使用镜像域名请先在源设置中切换到 www.wnacg.com'
         },
 
         /**
@@ -222,7 +248,7 @@ class Wnacg extends ComicSource {
              * - for `mixed` type, use param `page` as index. for each index(0-based), return {data: [], maxPage: number?}, data is an array contains Comic[] or {title: string, comics: Comic[], viewMore: string?}
              */
             load: async (page) => {
-                let res = await Network.get(this.baseUrl, {})
+                let res = await Network.get(this.baseUrl, {'user-agent': Wnacg.UA})
                 if (res.status !== 200) {
                     throw `Invalid Status Code ${res.status}`
                 }
@@ -428,7 +454,7 @@ class Wnacg extends ComicSource {
                 url = `${lr[0]}albums-${lr[1]}`;
             }
 
-            let res = await Network.get(url, {})
+            let res = await Network.get(url, {'user-agent': Wnacg.UA})
             if (res.status !== 200) {
                 throw `Invalid Status Code ${res.status}`
             }
@@ -458,7 +484,7 @@ class Wnacg extends ComicSource {
                     url = `${this.baseUrl}/albums-favorite_ranking-page-${page}-type-${option}.html`
                 }
 
-                let res = await Network.get(url, {})
+                let res = await Network.get(url, {'user-agent': Wnacg.UA})
                 if (res.status !== 200) {
                     throw `Invalid Status Code ${res.status}`
                 }
@@ -505,7 +531,7 @@ class Wnacg extends ComicSource {
             if (page !== 0) {
                 url += `&p=${page}`
             }
-            let res = await Network.get(url, {})
+            let res = await Network.get(url, {'user-agent': Wnacg.UA})
             if (res.status !== 200) {
                 throw `Invalid Status Code ${res.status}`
             }
@@ -542,13 +568,14 @@ class Wnacg extends ComicSource {
          */
         addOrDelFavorite: async (comicId, folderId, isAdding, favoriteId) => {
             if (!isAdding) {
-                let res = await Network.get(`${this.baseUrl}/users-fav_del-id-${favoriteId}.html?ajax=true&_t=${randomDouble(0, 1)}`, {})
+                let res = await Network.get(`${this.baseUrl}/users-fav_del-id-${favoriteId}.html?ajax=true&_t=${randomDouble(0, 1)}`, {'user-agent': Wnacg.UA})
                 if (res.status !== 200) {
                     throw 'Delete failed'
                 }
             } else {
                 let res = await Network.post(`${this.baseUrl}/users-save_fav-id-${comicId}.html`, {
-                    'content-type': 'application/x-www-form-urlencoded'
+                    'content-type': 'application/x-www-form-urlencoded',
+                    'user-agent': Wnacg.UA
                 }, `favc_id=${folderId}`)
                 if (res.status !== 200) {
                     throw 'Delete failed'
@@ -564,7 +591,7 @@ class Wnacg extends ComicSource {
          * @returns {Promise<{folders: {[p: string]: string}, favorited: string[]}>} - `folders` is a map of folder id to folder name, `favorited` is a list of folder id which contains the comic
          */
         loadFolders: async (comicId) => {
-            let res = await Network.get(`${this.baseUrl}/users-addfav-id-210814.html`, {})
+            let res = await Network.get(`${this.baseUrl}/users-addfav-id-210814.html`, {'user-agent': Wnacg.UA})
             if (res.status !== 200) {
                 throw 'Load failed'
             }
@@ -586,7 +613,8 @@ class Wnacg extends ComicSource {
          */
         addFolder: async (name) => {
             let res = await Network.post(`${this.baseUrl}/users-favc_save-id.html`, {
-                'content-type': 'application/x-www-form-urlencoded'
+                'content-type': 'application/x-www-form-urlencoded',
+                'user-agent': Wnacg.UA
             }, `favc_name=${encodeURIComponent(name)}`)
             if (res.status !== 200) {
                 throw 'Add failed'
@@ -599,7 +627,7 @@ class Wnacg extends ComicSource {
          * @returns {Promise<void>} - return any value to indicate success
          */
         deleteFolder: async (folderId) => {
-            let res = await Network.get(`${this.baseUrl}/users-favclass_del-id-${folderId}.html?ajax=true&_t=${randomDouble()}`, {})
+            let res = await Network.get(`${this.baseUrl}/users-favclass_del-id-${folderId}.html?ajax=true&_t=${randomDouble()}`, {'user-agent': Wnacg.UA})
             if (res.status !== 200) {
                 throw 'Delete failed'
             }
@@ -614,7 +642,7 @@ class Wnacg extends ComicSource {
          */
         loadComics: async (page, folder) => {
             let url = `${this.baseUrl}/users-users_fav-page-${page}-c-${folder}.html.html`
-            let res = await Network.get(url, {})
+            let res = await Network.get(url, {'user-agent': Wnacg.UA})
             if (res.status !== 200) {
                 throw `Invalid Status Code ${res.status}`
             }
@@ -661,7 +689,7 @@ class Wnacg extends ComicSource {
          * @returns {Promise<ComicDetails>}
          */
         loadInfo: async (id) => {
-            let res = await Network.get(`${this.baseUrl}/photos-index-page-1-aid-${id}.html`, {})
+            let res = await Network.get(`${this.baseUrl}/photos-index-page-1-aid-${id}.html`, {'user-agent': Wnacg.UA})
             if (res.status !== 200) {
                 throw `Invalid Status Code ${res.status}`
             }
@@ -701,7 +729,7 @@ class Wnacg extends ComicSource {
          */
         loadThumbnails: async (id, next) => {
             next = next || '1'
-            let res = await Network.get(`${this.baseUrl}/photos-index-page-${next}-aid-${id}.html`, {});
+            let res = await Network.get(`${this.baseUrl}/photos-index-page-${next}-aid-${id}.html`, {'user-agent': Wnacg.UA});
             if (res.status !== 200) {
                 throw `Invalid Status Code ${res.status}`
             }
@@ -726,7 +754,7 @@ class Wnacg extends ComicSource {
          * @returns {Promise<{images: string[]}>}
          */
         loadEp: async (comicId, epId) => {
-            let res = await Network.get(`${this.baseUrl}/photos-gallery-aid-${comicId}.html`, {})
+            let res = await Network.get(`${this.baseUrl}/photos-gallery-aid-${comicId}.html`, {'user-agent': Wnacg.UA})
             if (res.status !== 200) {
                 throw `Invalid Status Code ${res.status}`
             }

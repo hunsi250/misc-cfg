@@ -1033,7 +1033,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.7";
+  version = "1.1.8";
 
   minAppVersion = "1.4.6";
 
@@ -1523,9 +1523,15 @@ class Hitomi extends ComicSource {
 
       this.galleryCache = data;
 
+      const _lang = tags.get("语言")?.[0] || "";
+      let _desc = "";
+      if (_lang) _desc += `语言: ${_lang}`;
+      if (data.files.length) _desc += (_desc ? " | " : "") + `页数: ${data.files.length}`;
+
       return new ComicDetails({
         title: data.title,
         cover: get_thumbnail_url_from_hash(data.thumbnail_hash, true),
+        description: _desc,
         tags,
         maxPage: data.files.length,
         thumbnails: data.files.map((n) => get_thumbnail_url_from_hash(n.hash)),

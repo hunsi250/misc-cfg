@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.8"
+    version = "1.1.9"
 
     minAppVersion = "1.0.0"
 
@@ -909,11 +909,18 @@ class Nhentai extends ComicSource {
 
                 let related = (data.related || []).map(e => this.parseComicFromApi(e))
 
+                let _lang = (tags.get("语言") || [])[0] || ""
+                let _pages = data?.num_pages || 0
+                let _desc = ""
+                if (_lang) _desc += `语言: ${_lang}`
+                if (_pages) _desc += (_desc ? " | " : "") + `页数: ${_pages}`
+
                 let comic = new ComicDetails({
                     id: String(id),
                     title: title || String(id),
                     subtitle: subtitle || "",
                     cover: cover || "",
+                    description: _desc,
                     tags: tags,
                     maxPage: data?.num_pages || 0,
                     uploadTime: this.formatTimestamp(data?.upload_date),
@@ -988,11 +995,17 @@ class Nhentai extends ComicSource {
             catch (e) {
                 // pass
             }
+            let _lang = (tags.get("语言") || [])[0] || ""
+            let _desc = ""
+            if (_lang) _desc += `语言: ${_lang}`
+            if (maxPage) _desc += (_desc ? " | " : "") + `页数: ${maxPage}`
+
             let comic = new ComicDetails({
                 id: String(id),
                 title: title || String(id),
                 subtitle: subtitle || "",
                 cover: cover || "",
+                description: _desc,
                 tags: tags,
                 maxPage: maxPage,
                 uploadTime: uploadTime || "",

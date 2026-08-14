@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.5"
+    version = "1.2.6"
 
     minAppVersion = "1.5.3"
 
@@ -818,11 +818,17 @@ class Ehentai extends ComicSource {
             }
             let comments = this.comic.parseComments(document)
 
+            let _lang = (tags.get("语言") || [])[0] || ""
+            let _desc = ""
+            if (_lang) _desc += `语言: ${_lang}`
+            if (maxPage) _desc += (_desc ? " | " : "") + `页数: ${maxPage}`
+
             let comic = new ComicDetails({
                 id: id,
                 title: title,
                 subTitle: subtitle,
                 cover: coverPath,
+                description: _desc,
                 tags: tags,
                 stars: stars,
                 maxPage: Number(maxPage),

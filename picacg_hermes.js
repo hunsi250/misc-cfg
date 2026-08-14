@@ -24,7 +24,7 @@ class Picacg extends ComicSource {
 
     key = "picacg_hermes"
 
-    version = "1.0.10"
+    version = "1.0.11"
 
     minAppVersion = "1.0.0"
 
@@ -747,23 +747,9 @@ class Picacg extends ComicSource {
             return 'ok'
         },
         onClickTag: (namespace, tag) => {
-            if(namespace === 'Author') {
-                return {
-                    action: 'category',
-                    keyword: tag,
-                    param: 'a',
-                }
-            } else if (namespace === 'Categories') {
-                return {
-                    action: 'category',
-                    keyword: tag,
-                    param: 'c',
-                }
-            } else {
-                return {
-                    action: 'search',
-                    keyword: tag,
-                }
+            return {
+                action: 'search',
+                keyword: tag,
             }
         }
     }

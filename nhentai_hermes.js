@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.6"
+    version = "1.1.7"
 
     minAppVersion = "1.0.0"
 
@@ -1048,19 +1048,6 @@ class Nhentai extends ComicSource {
         },
         // {string?} - regex string, used to identify comic id from user input
         idMatch: "^(\\d+|nh\\d+|nhentai\\d+)$",
-        /**
-         * [Optional] Handle tag click event
-         * @param namespace {string}
-         * @param tag {string}
-         * @returns {{action: string, keyword: string, param: string?}}
-         */
-        onClickTag: (namespace, tag) => {
-            return {
-                action: 'category',
-                keyword: tag,
-                param: namespace,
-            }
-        },
         link: {
             domains: [
                 'nhentai.net',

@@ -24,7 +24,7 @@ class Picacg extends ComicSource {
 
     key = "picacg_hermes"
 
-    version = "1.0.11"
+    version = "1.0.12"
 
     minAppVersion = "1.0.0"
 
@@ -113,13 +113,17 @@ class Picacg extends ComicSource {
         let tags = []
         tags.push(...(comic.tags ?? []))
         tags.push(...(comic.categories ?? []))
+        let _desc = ""
+        if (comic.pagesCount) _desc += `页数: ${comic.pagesCount}`
+        let _likes = comic.totalLikes ?? comic.likesCount
+        if (_likes) _desc += (_desc ? " | " : "") + `${_likes} likes`
         return new Comic({
             id: comic._id,
             title: comic.title,
             subTitle: comic.author,
             cover: comic.thumb.fileServer + '/static/' + comic.thumb.path,
             tags: tags,
-            description: `${comic.totalLikes ?? comic.likesCount} likes`,
+            description: _desc,
             maxPage: comic.pagesCount,
         })
     }
@@ -586,10 +590,13 @@ class Picacg extends ComicSource {
             }
             let updateTime = new Date(info.updated_at)
             let formattedDate = updateTime.getFullYear() + '-' + (updateTime.getMonth() + 1) + '-' + updateTime.getDate()
+            let _desc = info.description || ""
+            if (info.pagesCount) _desc = `页数: ${info.pagesCount}` + (_desc ? " | " + _desc : "")
+
             return new ComicDetails({
                 title: info.title,
                 cover: info.thumb.fileServer + '/static/' + info.thumb.path,
-                description: info.description,
+                description: _desc,
                 tags: {
                     ...tags,
                     'Categories': info.categories,

@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.6"
+    version = "1.2.7"
 
     minAppVersion = "1.5.3"
 
@@ -322,13 +322,17 @@ class Ehentai extends ComicSource {
                     }
                     tags.push(tag)
                 }
+                let _desc = ""
+                if (language) _desc += `语言: ${this.langText(language)}`
+                if (pages) _desc += (_desc ? " | " : "") + `页数: ${pages}`
+                if (!_desc) _desc = time
                 galleries.push(new Comic({
                     id: link,
                     title: title,
                     subTitle: uploader,
                     cover: cover,
                     tags: tags,
-                    description: time,
+                    description: _desc,
                     stars: stars,
                     maxPage: pages,
                     language: language
@@ -348,11 +352,12 @@ class Ehentai extends ComicSource {
                 let stars = this.getStarsFromPosition(item.querySelector("div.gl5t > div > div.ir")?.attributes["style"] ?? "");
                 let link = item.querySelector("a")?.attributes["href"] ?? "";
                 let pages = Number(item.querySelectorAll("div.gl5t > div > div").find((element) => element.text.includes("page"))?.text.match(/\d+/)[0] ?? "0");
+                let _desc = pages ? `页数: ${pages}` : time
                 galleries.push(new Comic({
                     id: link,
                     title: title,
                     cover: coverPath,
-                    description: time,
+                    description: _desc,
                     stars: stars,
                     maxPage: pages,
                 }));
@@ -374,13 +379,17 @@ class Ehentai extends ComicSource {
                 let tags = item.querySelectorAll('div.gt, div.gtl').map((e) => e.attributes["title"] ?? "");
                 let pages = Number(item.querySelectorAll("td.gl2e > div > div.gl3e > div").find((element) => element.text.includes("page"))?.text.match(/\d+/)[0] ?? "");
                 let language = tags.find((e) => e.startsWith("language:") && !e.includes('translated'))?.split(":")[1].trim() ?? null;
+                let _desc = ""
+                if (language) _desc += `语言: ${this.langText(language)}`
+                if (pages) _desc += (_desc ? " | " : "") + `页数: ${pages}`
+                if (!_desc) _desc = time
                 galleries.push(new Comic({
                     id: link,
                     title: title,
                     subTitle: uploader,
                     cover: coverPath,
                     tags: tags,
-                    description: time,
+                    description: _desc,
                     stars: stars,
                     maxPage: pages,
                     language: language

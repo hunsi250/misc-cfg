@@ -1033,7 +1033,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.8";
+  version = "1.1.9";
 
   minAppVersion = "1.4.6";
 
@@ -1045,6 +1045,9 @@ class Hitomi extends ComicSource {
   searchResultCaches = new Map();
 
   _mapGalleryBlockInfoToComic(n) {
+    let _desc = "";
+    if (n.language) _desc += `语言: ${this.langText(n.language)}`;
+    if (!_desc) _desc = n.type ? n.type + "\n" + formatDate(n.posted_time) : n.posted_time;
     return new Comic({
       id: n.gid,
       title: n.title,
@@ -1057,9 +1060,7 @@ class Hitomi extends ComicSource {
         ...n.others.map((m) => "f:" + m),
       ],
       language: n.language,
-      description: n.type
-        ? n.type + "\n" + formatDate(n.posted_time)
-        : n.posted_time,
+      description: _desc,
     });
   }
 

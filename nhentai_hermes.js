@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.9"
+    version = "1.1.10"
 
     minAppVersion = "1.0.0"
 
@@ -102,13 +102,16 @@ class Nhentai extends ComicSource {
                 tagsRes.push(Nhentai.nhentaiTags[tag]);
             }
         }
+        let _desc = id
+        if (lang !== "Unknown") _desc = `语言: ${this.langText(lang)}`
+
         return new Comic({
             id: id,
             title: name,
             subtitle: "",
             cover: this.toAbsoluteMediaUrl(img, true),
             tags: tagsRes,
-            description: id,
+            description: _desc,
             language: lang
         })
     }
@@ -216,13 +219,18 @@ class Nhentai extends ComicSource {
             }
         }
 
+        let _desc = ""
+        if (lang !== "Unknown") _desc += `语言: ${this.langText(lang)}`
+        if (item.num_pages) _desc += (_desc ? " | " : "") + `页数: ${item.num_pages}`
+        if (!_desc) _desc = String(item.id)
+
         return new Comic({
             id: String(item.id),
             title: item.english_title || item.japanese_title || String(item.id),
             subtitle: "",
             cover: this.toAbsoluteMediaUrl(item.thumbnail, true),
             tags: tagsRes,
-            description: String(item.id),
+            description: _desc,
             language: lang,
             maxPage: item.num_pages || 0
         })

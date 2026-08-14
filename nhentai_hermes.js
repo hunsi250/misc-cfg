@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.10"
+    version = "1.1.11"
 
     minAppVersion = "1.0.0"
 
@@ -770,6 +770,17 @@ class Nhentai extends ComicSource {
          */
         load: async (keyword, options, page) => {
             let sort = options[0] || "date"
+            let language = options[1]
+            let commonTags = []
+            try { commonTags = JSON.parse(options[2] ?? "[]"); } catch(e) { commonTags = []; }
+            if(language && !keyword.includes("language:")) {
+                keyword += ` language:${language}`
+            }
+            for(let t of commonTags) {
+                if(t && !keyword.includes(t)) {
+                    keyword += ` tag:${t}`
+                }
+            }
             let url = `${this.apiBaseUrl}/search?query=${encodeURIComponent(keyword)}&page=${page}&sort=${sort}`
             let res = await Network.get(url, this.getApiBaseHeaders());
             if(res.status !== 200) {
@@ -791,7 +802,29 @@ class Nhentai extends ComicSource {
                 ],
                 // option label
                 label: "sort"
-            }
+            },
+            {
+                type: "dropdown",
+                options: [
+                    "-<none>",
+                    "chinese-Chinese",
+                    "english-English",
+                    "japanese-Japanese",
+                    "russian-Russian",
+                ],
+                label: "Language",
+            },
+            {
+                type: "multi-select",
+                options: [
+                    "tankoubon-单行本",
+                    "anthology-合集",
+                    "compilation-总集篇",
+                    "uncensored-无修正",
+                ],
+                label: "Common Tags",
+                default: [],
+            },
         ],
 
         enableTagsSuggestions: true,
@@ -1121,6 +1154,7 @@ class Nhentai extends ComicSource {
             'Popular Month': '本月热门',
             'Popular All': '热门',
             'sort': '排序',
+            'Common Tags': '常用标签',
             "Languages": "语言",
             "Artists": "画师",
             "Characters": "角色",
@@ -1137,6 +1171,7 @@ class Nhentai extends ComicSource {
             'Popular Month': '本月熱門',
             'Popular All': '熱門',
             'sort': '排序',
+            'Common Tags': '常用標籤',
             "Languages": "語言",
             "Artists": "畫師",
             "Characters": "角色",

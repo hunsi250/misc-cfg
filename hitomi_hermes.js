@@ -1033,7 +1033,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.9";
+  version = "1.1.10";
 
   minAppVersion = "1.4.6";
 
@@ -1321,6 +1321,12 @@ class Hitomi extends ComicSource {
      * @returns {Promise<{comics: Comic[], maxPage: number}>}
      */
     load: async (keyword, options, page) => {
+      // 筛选: 语言 + 常用标签 (照 ehentai 格式)
+      const _lang = options[1];
+      let _tags = [];
+      try { _tags = JSON.parse(options[2] ?? "[]"); } catch(e) { _tags = []; }
+      if(_lang && !keyword.includes("language:")) keyword += ` language:${_lang}`;
+      for(let t of _tags) { if(t && !keyword.includes(t)) keyword += ` tag:${t}`; }
       // 统一语法转换: artist:"tebasaki nobuo" → artist:tebasaki_nobuo (去引号, 空格→下划线)
       const _p = this.parseSearchSyntax(keyword || "");
       let _term = _p.plain;
@@ -1459,6 +1465,28 @@ class Hitomi extends ComicSource {
         // default selected options. If not set, use the first option as default
         default: null,
       },
+      {
+        type: "dropdown",
+        options: [
+          "-<none>",
+          "chinese-Chinese",
+          "english-English",
+          "japanese-Japanese",
+          "russian-Russian",
+        ],
+        label: "Language",
+      },
+      {
+        type: "multi-select",
+        options: [
+          "tankoubon-单行本",
+          "anthology-合集",
+          "compilation-总集篇",
+          "uncensored-无修正",
+        ],
+        label: "Common Tags",
+        default: [],
+      },
     ],
 
     // enable tags suggestions
@@ -1491,6 +1519,35 @@ class Hitomi extends ComicSource {
       // return the text to insert into search box
       return `${fixedNamespace}:${tag.replaceAll(" ", "_")}`;
     },
+  };
+
+  // [Optional] translations for the strings in this config
+  translation = {
+    'zh_CN': {
+      'sort': '排序',
+      'Date Added': '添加日期',
+      'Date Published': '发布日期',
+      'Popular:Today': '热门:今日',
+      'Popular:Week': '热门:本周',
+      'Popular:Month': '热门:本月',
+      'Popular:Year': '热门:今年',
+      'Random': '随机',
+      'Language': '语言',
+      'Common Tags': '常用标签',
+    },
+    'zh_TW': {
+      'sort': '排序',
+      'Date Added': '添加日期',
+      'Date Published': '發布日期',
+      'Popular:Today': '熱門:今日',
+      'Popular:Week': '熱門:本週',
+      'Popular:Month': '熱門:本月',
+      'Popular:Year': '熱門:今年',
+      'Random': '隨機',
+      'Language': '語言',
+      'Common Tags': '常用標籤',
+    },
+    'en': {},
   };
 
   /// single comic related

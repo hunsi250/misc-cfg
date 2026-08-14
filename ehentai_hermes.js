@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.7"
+    version = "1.2.8"
 
     minAppVersion = "1.5.3"
 
@@ -545,6 +545,13 @@ class Ehentai extends ComicSource {
             if(language && !keyword.includes("language:")) {
                 keyword += ` language:${language}`
             }
+            let commonTags = [];
+            try { commonTags = JSON.parse(options[3] ?? "[]"); } catch(e) { commonTags = []; }
+            for(let t of commonTags) {
+                if(t && !keyword.includes(t)) {
+                    keyword += ` "${t}"`
+                }
+            }
             let url = `${this.baseUrl}/?f_search=${encodeURIComponent(keyword)}`
             if(fcats) {
                 url += `&f_cats=${fcats}`
@@ -606,9 +613,21 @@ class Ehentai extends ComicSource {
                     "chinese-Chinese",
                     "english-English",
                     "japanese-Japanese",
+                    "russian-Russian",
                 ],
                 // option label
                 label: "Language",
+            },
+            {
+                type: "multi-select",
+                options: [
+                    "tankoubon-单行本",
+                    "anthology-合集",
+                    "compilation-总集篇",
+                    "uncensored-无修正",
+                    "full color-全彩",
+                ],
+                label: "Common Tags",
             },
         ],
 
@@ -1540,6 +1559,7 @@ class Ehentai extends ComicSource {
             "Category": "分类",
             "Min Stars": "最少星星",
             "Language": "语言",
+            "Common Tags": "常用标签",
             "H@H Original": "H@H 原版",
             "H@H 800x": "H@H 800x",
             "H@H 1280x": "H@H 1280x", 
@@ -1577,6 +1597,7 @@ class Ehentai extends ComicSource {
             "Category": "分類",
             "Min Stars": "最少星星",
             "Language": "語言",
+            "Common Tags": "常用標籤",
             "H@H Original": "H@H 原版",
             "H@H 800x": "H@H 800x",
             "H@H 1280x": "H@H 1280x",
@@ -1614,6 +1635,7 @@ class Ehentai extends ComicSource {
             "Category": "Category",
             "Min Stars": "Min Stars",
             "Language": "Language",
+            "Common Tags": "Common Tags",
             "H@H Original": "H@H Original",
             "H@H 800x": "H@H 800x",
             "H@H 1280x": "H@H 1280x",

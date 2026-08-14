@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.4"
+    version = "1.1.5"
 
     minAppVersion = "1.0.0"
 
@@ -770,6 +770,14 @@ class Nhentai extends ComicSource {
         ],
 
         enableTagsSuggestions: true,
+    }
+
+    // tag 点击 → 打开搜索结果页 (会记录搜索历史)
+    handleClickTagEvent = (namespace, tag) => {
+        return {
+            action: 'search',
+            keyword: tag,
+        }
     }
 
     // favorite related

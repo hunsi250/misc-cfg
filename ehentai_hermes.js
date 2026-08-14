@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.8"
+    version = "1.2.9"
 
     minAppVersion = "1.5.3"
 
@@ -628,6 +628,7 @@ class Ehentai extends ComicSource {
                     "full color-全彩",
                 ],
                 label: "Common Tags",
+                default: [],
             },
         ],
 

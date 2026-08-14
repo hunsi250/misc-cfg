@@ -20,6 +20,23 @@ class Ehentai extends ComicSource {
         return { fields, plain };
     }
 
+    langText(v) {
+        if (!v) return v
+        const s = String(v).toLowerCase().trim()
+        const m = {
+            english: "英语", japanese: "日语", chinese: "中文", translated: "翻译版",
+            korean: "韩语", french: "法语", german: "德语", spanish: "西班牙语",
+            russian: "俄语", italian: "意大利语", portuguese: "葡萄牙语",
+            thai: "泰语", vietnamese: "越南语", indonesian: "印尼语",
+            polish: "波兰语", dutch: "荷兰语", turkish: "土耳其语", arabic: "阿拉伯语",
+            ukrainian: "乌克兰语", czech: "捷克语", hungarian: "匈牙利语",
+            finnish: "芬兰语", swedish: "瑞典语", danish: "丹麦语", norwegian: "挪威语",
+            greek: "希腊语", hebrew: "希伯来语", hindi: "印地语", filipino: "菲律宾语",
+            malay: "马来语", latin: "拉丁语", other: "其他",
+        }
+        return m[s] ?? v
+    }
+
     // Note: The fields which are marked as [Optional] should be removed if not used
 
     // name of the source
@@ -28,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.4"
+    version = "1.2.5"
 
     minAppVersion = "1.5.3"
 
@@ -735,15 +752,18 @@ class Ehentai extends ComicSource {
 
             let tags = new Map();
             for(let tr of document.querySelectorAll("div#taglist > table > tbody > tr")) {
-                tags.set(
-                    tr.children[0].text.substring(0, tr.children[0].text.length - 1),
-                    tr.children[1].children.map((e) =>
-                        e.children[0]
-                        .attributes["onclick"]
-                        .split(":")[1]
-                        .split("'")[0]
-                    )
-                )
+                let key = tr.children[0].text.substring(0, tr.children[0].text.length - 1);
+                let vals = tr.children[1].children.map((e) =>
+                    e.children[0]
+                    .attributes["onclick"]
+                    .split(":")[1]
+                    .split("'")[0]
+                );
+                if (key === "language") {
+                    key = "语言";
+                    vals = vals.map((v) => this.langText(v));
+                }
+                tags.set(key, vals)
             }
 
             let maxPage = "1"

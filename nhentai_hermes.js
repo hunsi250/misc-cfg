@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.7"
+    version = "1.1.8"
 
     minAppVersion = "1.0.0"
 
@@ -280,7 +280,7 @@ class Nhentai extends ComicSource {
 
     tagNamespace(tagType) {
         switch ((tagType || "").toLowerCase()) {
-            case "language": return "Languages"
+            case "language": return "语言"
             case "artist": return "Artists"
             case "character": return "Characters"
             case "group": return "Groups"
@@ -291,6 +291,23 @@ class Nhentai extends ComicSource {
                 if (!tagType) return "Tags"
                 return tagType.charAt(0).toUpperCase() + tagType.slice(1)
         }
+    }
+
+    langText(v) {
+        if (!v) return v
+        const s = String(v).toLowerCase().trim()
+        const m = {
+            english: "英语", japanese: "日语", chinese: "中文", translated: "翻译版",
+            korean: "韩语", french: "法语", german: "德语", spanish: "西班牙语",
+            russian: "俄语", italian: "意大利语", portuguese: "葡萄牙语",
+            thai: "泰语", vietnamese: "越南语", indonesian: "印尼语",
+            polish: "波兰语", dutch: "荷兰语", turkish: "土耳其语", arabic: "阿拉伯语",
+            ukrainian: "乌克兰语", czech: "捷克语", hungarian: "匈牙利语",
+            finnish: "芬兰语", swedish: "瑞典语", danish: "丹麦语", norwegian: "挪威语",
+            greek: "希腊语", hebrew: "希伯来语", hindi: "印地语", filipino: "菲律宾语",
+            malay: "马来语", latin: "拉丁语", other: "其他",
+        }
+        return m[s] ?? v
     }
 
     findCookieValue(cookies, name) {
@@ -871,7 +888,7 @@ class Nhentai extends ComicSource {
                     if (!tags.has(displayNamespace)) {
                             tags.set(displayNamespace, [])
                     }
-                    tags.get(displayNamespace).push(tag.name)
+                    tags.get(displayNamespace).push(namespace === "language" ? this.langText(tag.name) : tag.name)
                 }
 
                 let thumbnails = (data.pages || [])
@@ -937,6 +954,7 @@ class Nhentai extends ComicSource {
                     uploadTime = `${year}-${month}-${day} ${hour}:${minute}`
                 }
             }
+            let maxPage = null;
             for (let field of document.querySelectorAll("div.tag-container")) {
                 let name = field.nodes[0].text.trim().replaceAll(':', '')
                 if(name === "Uploaded") {
@@ -944,7 +962,13 @@ class Nhentai extends ComicSource {
                 }
                 let r = field.querySelectorAll("span.name").map(e => e.text);
                 if(r.length > 0) {
-                    tags.set(name, r)
+                    if (name === "Pages") {
+                        let p = parseInt(r[0], 10)
+                        if (!Number.isNaN(p)) maxPage = p
+                        continue
+                    }
+                    if (name === "Languages") name = "语言"
+                    tags.set(name, name === "语言" ? r.map((v) => this.langText(v)) : r)
                 }
             }
             let isFavorite = this.isLogged && document.querySelector("button#favorite > span.text")?.text !== "Favorite"
@@ -970,6 +994,7 @@ class Nhentai extends ComicSource {
                 subtitle: subtitle || "",
                 cover: cover || "",
                 tags: tags,
+                maxPage: maxPage,
                 uploadTime: uploadTime || "",
                 isFavorite: isFavorite,
                 thumbnails: thumbs,

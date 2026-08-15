@@ -32,6 +32,7 @@ const namespaces = [
 const refererUrl = "https://hitomi.la/";
 let galleries_index_version = "";
 let gg = undefined;
+let _ggCache = null;
 
 /**
  * 求交集
@@ -459,18 +460,20 @@ async function update_galleries_index_version() {
 }
 
 async function get_image_srcs(files) {
-  const resp = await Network.get(
-    "https://" + domain + "/" + "gg.js?_=" + new Date().getTime(),
-    {
-      referer: refererUrl,
+  if (!_ggCache) {
+    const resp = await Network.get(
+      "https://" + domain + "/" + "gg.js",
+      {
+        referer: refererUrl,
+      }
+    );
+    if (resp.status >= 400) {
+      throw new Error(resp.status);
     }
-  );
-  if (resp.status >= 400) {
-    throw new Error(resp.status);
+    eval(resp.body);
+    if (!gg.b) throw new Error();
+    _ggCache = gg;
   }
-
-  eval(resp.body);
-  if (!gg.b) throw new Error();
 
   const subdomain_from_url = (url, base, dir) => {
     var retval = "";
@@ -493,9 +496,9 @@ async function get_image_srcs(files) {
     var g = parseInt(m[2] + m[1], b);
     if (!isNaN(g)) {
       if (base) {
-        retval = String.fromCharCode(97 + gg.m(g)) + base;
+        retval = String.fromCharCode(97 + _ggCache.m(g)) + base;
       } else {
-        retval = retval + (1 + gg.m(g));
+        retval = retval + (1 + _ggCache.m(g));
       }
     }
     return retval;
@@ -545,7 +548,7 @@ async function get_image_srcs(files) {
   };
 
   const full_path_from_hash = (hash) => {
-    return gg.b + gg.s(hash) + "/" + hash;
+    return _ggCache.b + _ggCache.s(hash) + "/" + hash;
   };
 
   const real_full_path_from_hash = (hash) => {
@@ -1033,7 +1036,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.11";
+  version = "1.1.12";
 
   minAppVersion = "1.4.6";
 
@@ -1052,7 +1055,7 @@ class Hitomi extends ComicSource {
       id: n.gid,
       title: n.title,
       subTitle: n.artists.length ? n.artists.join(" ") : "",
-      cover: get_thumbnail_url_from_hash(n.thumbnail_hashs[0], true),
+      cover: get_thumbnail_url_from_hash(n.thumbnail_hashs[0], false),
       tags: [
         ...n.series,
         ...n.females.map((m) => "f:" + m),

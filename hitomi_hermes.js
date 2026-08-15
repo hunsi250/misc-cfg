@@ -551,7 +551,7 @@ async function get_image_srcs(files) {
   const real_full_path_from_hash = (hash) => {
     return hash.replace(/^.*(..)(.)$/, "$2/$1/" + hash);
   };
-  return files.map((image) => url_from_url_from_hash(0, image, "avif"));
+  return files.map((image) => url_from_url_from_hash(0, image, "webp"));
 }
 
 /**
@@ -562,13 +562,13 @@ async function get_image_srcs(files) {
  */
 function get_thumbnail_url_from_hash(hash, bigTn) {
   return (
-    "https://atn." +
+    "https://tn." +
     domain2 +
     "/" +
-    `${bigTn ? "avifbigtn" : "avifsmalltn"}/${hash.slice(-1)}/${hash.slice(
+    `${bigTn ? "webpbigtn" : "webpsmalltn"}/${hash.slice(-1)}/${hash.slice(
       -3,
       -1
-    )}/${hash}.avif`
+    )}/${hash}.webp`
   );
 }
 
@@ -1033,7 +1033,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.10";
+  version = "1.1.11";
 
   minAppVersion = "1.4.6";
 

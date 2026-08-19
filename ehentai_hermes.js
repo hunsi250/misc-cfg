@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.10"
+    version = "1.2.11"
 
     minAppVersion = "1.5.3"
 
@@ -547,10 +547,16 @@ class Ehentai extends ComicSource {
             }
             let commonTags = [];
             try { commonTags = JSON.parse(options[3] ?? "[]"); } catch(e) { commonTags = []; }
-            for(let t of commonTags) {
+            const _pub = ["tankoubon", "soushuuhen", "compilation"];
+            const pubTags = commonTags.filter(t => _pub.includes(t));
+            const otherTags = commonTags.filter(t => !_pub.includes(t));
+            for(let t of otherTags) {
                 if(t && !keyword.includes(t)) {
                     keyword += ` "${t}"`
                 }
+            }
+            if(pubTags.length) {
+                keyword += ` ${pubTags.map(t => `"${t}"`).join("$")}`
             }
             let url = `${this.baseUrl}/?f_search=${encodeURIComponent(keyword)}`
             if(fcats) {
@@ -623,6 +629,7 @@ class Ehentai extends ComicSource {
                 options: [
                     "tankoubon-单行本",
                     "soushuuhen-总集篇",
+                    "compilation-汇编",
                     "uncensored-无修正",
                     "full color-全彩",
                 ],

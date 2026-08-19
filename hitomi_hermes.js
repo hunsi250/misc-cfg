@@ -1036,7 +1036,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.13";
+  version = "1.1.14";
 
   minAppVersion = "1.4.6";
 
@@ -1328,8 +1328,11 @@ class Hitomi extends ComicSource {
       const _lang = options[1];
       let _tags = [];
       try { _tags = JSON.parse(options[2] ?? "[]"); } catch(e) { _tags = []; }
+      const _pub = ["tankoubon", "soushuuhen", "compilation"];
+      const _pubTags = _tags.filter(t => _pub.includes(t));
+      const _otherTags = _tags.filter(t => !_pub.includes(t));
       if(_lang && !keyword.includes("language:")) keyword += ` language:${_lang}`;
-      for(let t of _tags) { if(t && !keyword.includes(t)) keyword += ` tag:${t}`; }
+      for(let t of _otherTags) { if(t && !keyword.includes(t)) keyword += ` tag:${t}`; }
       // 统一语法转换: artist:"tebasaki nobuo" → artist:tebasaki_nobuo (去引号, 空格→下划线)
       const _p = this.parseSearchSyntax(keyword || "");
       let _term = _p.plain;
@@ -1339,6 +1342,10 @@ class Hitomi extends ComicSource {
         _term += (_term ? " " : "") + _p.fields[_f].map(v => _pf + ":" + v.replace(/\s+/g, "_")).join(" ");
       }
       keyword = _term;
+      // 出版形态 OR (parseSearchSyntax 之后拼, 由 hitomi 的 parseQuery 处理 `or`)
+      if(_pubTags.length) {
+        keyword += (keyword ? " " : "") + _pubTags.map(t => `tag:${t}`).join(" or ");
+      }
       const cacheKey = (keyword || "") + "|" + options.join(",");
       if (page === 1) {
         const option = parseInt(options[0]);
@@ -1483,7 +1490,8 @@ class Hitomi extends ComicSource {
         type: "multi-select",
         options: [
           "tankoubon-单行本",
-          "compilation-总集篇",
+          "soushuuhen-总集篇",
+          "compilation-汇编",
           "uncensored-无修正",
         ],
         label: "Common Tags",

@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.12"
+    version = "1.1.13"
 
     minAppVersion = "1.0.0"
 
@@ -776,17 +776,44 @@ class Nhentai extends ComicSource {
             if(language && !keyword.includes("language:")) {
                 keyword += ` language:${language}`
             }
-            for(let t of commonTags) {
+            const _pub = ["tankoubon", "soushuuhen", "compilation"]
+            const pubTags = commonTags.filter(t => _pub.includes(t))
+            const otherTags = commonTags.filter(t => !_pub.includes(t))
+            for(let t of otherTags) {
                 if(t && !keyword.includes(t)) {
                     keyword += ` tag:${t}`
                 }
             }
-            let url = `${this.apiBaseUrl}/search?query=${encodeURIComponent(keyword)}&page=${page}&sort=${sort}`
-            let res = await Network.get(url, this.getApiBaseHeaders());
-            if(res.status !== 200) {
-                throw "Invalid Status Code: " + res.status
+            if(pubTags.length <= 1) {
+                for(let t of pubTags) {
+                    if(t && !keyword.includes(t)) keyword += ` tag:${t}`
+                }
+                let url = `${this.apiBaseUrl}/search?query=${encodeURIComponent(keyword)}&page=${page}&sort=${sort}`
+                let res = await Network.get(url, this.getApiBaseHeaders());
+                if(res.status !== 200) {
+                    throw "Invalid Status Code: " + res.status
+                }
+                return this.parseComicListFromApi(JSON.parse(res.body))
             }
-            return this.parseComicListFromApi(JSON.parse(res.body))
+            // 多个出版形态 tag: 分别搜索再合并去重 (OR)
+            const results = []
+            for(const t of pubTags) {
+                const q = `${keyword} tag:${t}`
+                const url = `${this.apiBaseUrl}/search?query=${encodeURIComponent(q)}&page=${page}&sort=${sort}`
+                const res = await Network.get(url, this.getApiBaseHeaders());
+                if(res.status !== 200) continue
+                results.push(this.parseComicListFromApi(JSON.parse(res.body)))
+            }
+            const seen = new Set()
+            const comics = []
+            let maxPage = 1
+            for(const r of results) {
+                if(r.maxPage > maxPage) maxPage = r.maxPage
+                for(const c of r.comics) {
+                    if(!seen.has(c.id)) { seen.add(c.id); comics.push(c) }
+                }
+            }
+            return { comics, maxPage }
         },
 
         // provide options for search
@@ -819,6 +846,7 @@ class Nhentai extends ComicSource {
                 options: [
                     "tankoubon-单行本",
                     "soushuuhen-总集篇",
+                    "compilation-汇编",
                     "uncensored-无修正",
                 ],
                 label: "Common Tags",

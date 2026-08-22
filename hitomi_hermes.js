@@ -970,6 +970,7 @@ function parseGalleryDetail(text) {
   return {
     gid: parseInt(data.id),
     title: data.title,
+    japanese_title: data.japanese_title || "",
     url: "https://hitomi.la" + data.galleryurl,
     type: data.type,
     length: data.files.length,
@@ -1036,7 +1037,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.17";
+  version = "1.1.18";
 
   minAppVersion = "1.4.6";
 
@@ -1573,7 +1574,8 @@ class Hitomi extends ComicSource {
       const tags = new Map();
       if ("type" in data && data.type) tags.set("type", [data.type]);
       if (data.groups.length) tags.set("groups", data.groups);
-      if (data.artists.length) tags.set("artists", data.artists);
+      const _authorMerged = [...data.artists, ...data.groups];
+      if (_authorMerged.length) tags.set("artists", [_authorMerged.join(", ")]);
       if ("language" in data && data.language)
         tags.set("语言", [this.langText(data.language)]);
       if (data.series.length) tags.set("series", data.series);
@@ -1591,9 +1593,6 @@ class Hitomi extends ComicSource {
 
       this.galleryCache = data;
 
-      const _author = [];
-      if (data.artists.length) _author.push("artist: " + data.artists.join(", "));
-      if (data.groups.length) _author.push("group: " + data.groups.join(", "));
       const _lang = tags.get("语言")?.[0] || "";
       let _desc = "";
       if (_lang) _desc += `语言: ${_lang}`;
@@ -1601,7 +1600,7 @@ class Hitomi extends ComicSource {
 
       return new ComicDetails({
         title: data.title,
-        subTitle: _author.join("\n"),
+        subTitle: data.japanese_title || "",
         cover: get_thumbnail_url_from_hash(data.thumbnail_hash, true),
         description: _desc,
         tags,

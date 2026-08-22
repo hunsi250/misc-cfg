@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.14"
+    version = "1.1.15"
 
     minAppVersion = "1.0.0"
 
@@ -952,6 +952,8 @@ class Nhentai extends ComicSource {
                 let data = JSON.parse(apiRes.body)
 
                 let title = data?.title?.pretty || data?.title?.english || String(id)
+                let englishTitle = data?.title?.english || ""
+                let subtitle = englishTitle && englishTitle !== title ? englishTitle : ""
                 let cover = this.toAbsoluteMediaUrl(data?.cover?.path || data?.thumbnail?.path || "", true)
                 
                 let tags = new Map();
@@ -995,10 +997,8 @@ class Nhentai extends ComicSource {
 
                 let related = (data.related || []).map(e => this.parseComicFromApi(e))
 
-                let _author = []
-                if (_artists.length) _author.push("artist: " + _artists.join(", "))
-                if (_groups.length) _author.push("group: " + _groups.join(", "))
-                let subtitle = _author.join("\n")
+                let _authorMerged = [..._artists, ..._groups]
+                if (_authorMerged.length) tags.set("Artists", [_authorMerged.join(", ")])
                 let _lang = (tags.get("语言") || [])[0] || ""
                 let _pages = data?.num_pages || 0
                 let _desc = ""

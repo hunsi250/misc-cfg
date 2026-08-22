@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.16"
+    version = "1.1.17"
 
     minAppVersion = "1.0.0"
 
@@ -186,6 +186,8 @@ class Nhentai extends ComicSource {
             lang = "中文";
         }
         let tagsRes = [];
+        let _artists = [];
+        let _groups = [];
 
         // 优先使用 API 返回的完整 tags
         if(item.tags && item.tags.length){
@@ -203,6 +205,8 @@ class Nhentai extends ComicSource {
                     namespace + ":" + tag.slug;
                 // 建立缓存
                 this.tagIdCache[cacheKey] = tag.id;
+                if (namespace === "artist") _artists.push(tag.name);
+                else if (namespace === "group") _groups.push(tag.name);
                 if(tag.name){
                     tagsRes.push(tag.name);
                 }
@@ -224,10 +228,14 @@ class Nhentai extends ComicSource {
         if (item.num_pages) _desc += (_desc ? " | " : "") + `页数: ${item.num_pages}`
         if (!_desc) _desc = String(item.id)
 
+        let _author = []
+        if (_artists.length) _author.push("artist: " + _artists.join(", "))
+        if (_groups.length) _author.push("group: " + _groups.join(", "))
+
         return new Comic({
             id: String(item.id),
             title: item.english_title || item.japanese_title || String(item.id),
-            subtitle: "",
+            subtitle: _author.join(" / "),
             cover: this.toAbsoluteMediaUrl(item.thumbnail, true),
             tags: tagsRes,
             description: _desc,

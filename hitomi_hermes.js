@@ -1037,7 +1037,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.19";
+  version = "1.1.20";
 
   minAppVersion = "1.4.6";
 
@@ -1055,7 +1055,7 @@ class Hitomi extends ComicSource {
     return new Comic({
       id: n.gid,
       title: n.title,
-      subTitle: n.artists.length ? n.artists.join(" ") : "",
+      subTitle: n.artists.length ? "artist: " + n.artists.join(", ") : "",
       cover: get_thumbnail_url_from_hash(n.thumbnail_hashs[0], false),
       tags: [
         ...n.series,

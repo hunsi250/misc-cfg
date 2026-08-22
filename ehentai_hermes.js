@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.14"
+    version = "1.2.15"
 
     minAppVersion = "1.5.3"
 
@@ -313,6 +313,8 @@ class Ehentai extends ComicSource {
                 } catch(e) {}
                 let tags = [];
                 let language = null
+                let _artists = []
+                let _groups = []
                 for (let node of item.children[2 + t].children[0].children[1].children) {
                     let tag = node.attributes["title"]
                     if (tag.startsWith("language:")) {
@@ -320,16 +322,21 @@ class Ehentai extends ComicSource {
                         language = l === 'translated' ? language : l
                         continue
                     }
+                    if (tag.startsWith("artist:")) _artists.push(tag.substring(7))
+                    else if (tag.startsWith("group:")) _groups.push(tag.substring(6))
                     tags.push(tag)
                 }
                 let _desc = ""
                 if (language) _desc += `语言: ${this.langText(language)}`
                 if (pages) _desc += (_desc ? " | " : "") + `页数: ${pages}`
                 if (!_desc) _desc = time
+                let _author = []
+                if (_artists.length) _author.push("artist: " + _artists.join(", "))
+                if (_groups.length) _author.push("group: " + _groups.join(", "))
                 galleries.push(new Comic({
                     id: link,
                     title: title,
-                    subTitle: uploader,
+                    subTitle: _author.join(" / "),
                     cover: cover,
                     tags: tags,
                     description: _desc,
@@ -377,16 +384,21 @@ class Ehentai extends ComicSource {
                 let stars = this.getStarsFromPosition(item.querySelector("td.gl2e > div > div.gl3e > div.ir")?.attributes["style"] ?? "");
                 let link = item.querySelector("td.gl1e > div > a")?.attributes["href"] ?? "";
                 let tags = item.querySelectorAll('div.gt, div.gtl').map((e) => e.attributes["title"] ?? "");
+                let _artists = tags.filter((e) => e.startsWith("artist:")).map((e) => e.substring(7));
+                let _groups = tags.filter((e) => e.startsWith("group:")).map((e) => e.substring(6));
                 let pages = Number(item.querySelectorAll("td.gl2e > div > div.gl3e > div").find((element) => element.text.includes("page"))?.text.match(/\d+/)[0] ?? "");
                 let language = tags.find((e) => e.startsWith("language:") && !e.includes('translated'))?.split(":")[1].trim() ?? null;
                 let _desc = ""
                 if (language) _desc += `语言: ${this.langText(language)}`
                 if (pages) _desc += (_desc ? " | " : "") + `页数: ${pages}`
                 if (!_desc) _desc = time
+                let _author = []
+                if (_artists.length) _author.push("artist: " + _artists.join(", "))
+                if (_groups.length) _author.push("group: " + _groups.join(", "))
                 galleries.push(new Comic({
                     id: link,
                     title: title,
-                    subTitle: uploader,
+                    subTitle: _author.join(" / "),
                     cover: coverPath,
                     tags: tags,
                     description: _desc,

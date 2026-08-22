@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.13"
+    version = "1.1.14"
 
     minAppVersion = "1.0.0"
 
@@ -915,6 +915,22 @@ class Nhentai extends ComicSource {
          * tag 点击 → 打开搜索结果页 (会记录搜索历史)
          */
         onClickTag: (namespace, tag) => {
+            const nsMap = {
+                "语言": "language",
+                "Artists": "artist",
+                "Groups": "group",
+                "Characters": "character",
+                "Parodies": "parody",
+                "Categories": "category",
+                "Tags": "tag",
+            };
+            const prefix = nsMap[namespace];
+            if (prefix) {
+                return {
+                    action: 'search',
+                    keyword: `${prefix}:${tag}`,
+                }
+            }
             return {
                 action: 'search',
                 keyword: tag,
@@ -936,13 +952,15 @@ class Nhentai extends ComicSource {
                 let data = JSON.parse(apiRes.body)
 
                 let title = data?.title?.pretty || data?.title?.english || String(id)
-                let englishTitle = data?.title?.english || ""
-                let subtitle = englishTitle && englishTitle !== title ? englishTitle : ""
                 let cover = this.toAbsoluteMediaUrl(data?.cover?.path || data?.thumbnail?.path || "", true)
                 
                 let tags = new Map();
+                let _artists = [];
+                let _groups = [];
                 for (let tag of (data.tags || [])) {
                     let namespace = (tag.type || "tag").toLowerCase();
+                    if (namespace === "artist") _artists.push(tag.name);
+                    else if (namespace === "group") _groups.push(tag.name);
                     if (!this.tagIdCache) {
                             this.tagIdCache = {};
                     }
@@ -977,6 +995,10 @@ class Nhentai extends ComicSource {
 
                 let related = (data.related || []).map(e => this.parseComicFromApi(e))
 
+                let _author = []
+                if (_artists.length) _author.push("artist: " + _artists.join(", "))
+                if (_groups.length) _author.push("group: " + _groups.join(", "))
+                let subtitle = _author.join("\n")
                 let _lang = (tags.get("语言") || [])[0] || ""
                 let _pages = data?.num_pages || 0
                 let _desc = ""

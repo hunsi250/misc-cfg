@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.11"
+    version = "1.2.12"
 
     minAppVersion = "1.5.3"
 
@@ -847,10 +847,12 @@ class Ehentai extends ComicSource {
             }
 
             let title = document.querySelector("h1#gn").text;
-            let subtitle = document.querySelector("h1#gj")?.text;
-            if(subtitle != null && subtitle.trim() === "") {
-                subtitle = null;
-            }
+            let _artists = tags.get("artist") || [];
+            let _groups = tags.get("group") || [];
+            let _author = [];
+            if (_artists.length) _author.push("artist: " + _artists.join(", "));
+            if (_groups.length) _author.push("group: " + _groups.join(", "));
+            let subtitle = _author.join("\n");
             let comments = this.comic.parseComments(document)
 
             let _lang = (tags.get("语言") || [])[0] || ""

@@ -1037,7 +1037,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.20";
+  version = "1.1.21";
 
   minAppVersion = "1.4.6";
 
@@ -1347,6 +1347,11 @@ class Hitomi extends ComicSource {
       if(_pubTags.length) {
         keyword += (keyword ? " " : "") + _pubTags.map(t => `tag:${t}`).join(" or ");
       }
+      let _excludes = [];
+      try { _excludes = JSON.parse(options[3] ?? "[]"); } catch(e) { _excludes = []; }
+      for(let t of _excludes) {
+        if(t) keyword += (keyword ? " " : "") + `-tag:${t}`;
+      }
       const cacheKey = (keyword || "") + "|" + options.join(",");
       if (page === 1) {
         const option = parseInt(options[0]);
@@ -1498,6 +1503,15 @@ class Hitomi extends ComicSource {
         label: "Common Tags",
         default: [],
       },
+      {
+        type: "multi-select",
+        options: [
+          "anthology-多作者合志",
+          "advertisement-外部广告",
+        ],
+        label: "Exclude",
+        default: [],
+      },
     ],
 
     // enable tags suggestions
@@ -1545,6 +1559,7 @@ class Hitomi extends ComicSource {
       'Random': '随机',
       'Language': '语言',
       'Common Tags': '常用标签',
+      'Exclude': '屏蔽',
     },
     'zh_TW': {
       'sort': '排序',
@@ -1557,6 +1572,7 @@ class Hitomi extends ComicSource {
       'Random': '隨機',
       'Language': '語言',
       'Common Tags': '常用標籤',
+      'Exclude': '遮蔽',
     },
     'en': {},
   };

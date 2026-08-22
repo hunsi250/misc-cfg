@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.17"
+    version = "1.1.18"
 
     minAppVersion = "1.0.0"
 
@@ -792,6 +792,13 @@ class Nhentai extends ComicSource {
                     keyword += ` tag:${t}`
                 }
             }
+            let excludeTags = []
+            try { excludeTags = JSON.parse(options[3] ?? "[]"); } catch(e) { excludeTags = []; }
+            for(let t of excludeTags) {
+                if(t && !keyword.includes(`-tag:${t}`)) {
+                    keyword += ` -tag:${t}`
+                }
+            }
             if(pubTags.length <= 1) {
                 for(let t of pubTags) {
                     if(t && !keyword.includes(t)) keyword += ` tag:${t}`
@@ -858,6 +865,15 @@ class Nhentai extends ComicSource {
                     "uncensored-无修正",
                 ],
                 label: "Common Tags",
+                default: [],
+            },
+            {
+                type: "multi-select",
+                options: [
+                    "anthology-多作者合志",
+                    "advertisement-外部广告",
+                ],
+                label: "Exclude",
                 default: [],
             },
         ],
@@ -1222,6 +1238,7 @@ class Nhentai extends ComicSource {
             'Popular All': '热门',
             'sort': '排序',
             'Common Tags': '常用标签',
+            'Exclude': '屏蔽',
             "Languages": "语言",
             "Artists": "画师",
             "Characters": "角色",
@@ -1239,6 +1256,7 @@ class Nhentai extends ComicSource {
             'Popular All': '熱門',
             'sort': '排序',
             'Common Tags': '常用標籤',
+            'Exclude': '遮蔽',
             "Languages": "語言",
             "Artists": "畫師",
             "Characters": "角色",

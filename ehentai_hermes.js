@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.15"
+    version = "1.2.16"
 
     minAppVersion = "1.5.3"
 
@@ -570,6 +570,11 @@ class Ehentai extends ComicSource {
             if(pubTags.length) {
                 keyword += ` ${pubTags.map(t => `"${t}"`).join("$")}`
             }
+            let excludeTags = [];
+            try { excludeTags = JSON.parse(options[4] ?? "[]"); } catch(e) { excludeTags = []; }
+            for(let t of excludeTags) {
+                if(t) keyword += ` -"${t}"`
+            }
             let url = `${this.baseUrl}/?f_search=${encodeURIComponent(keyword)}`
             if(fcats) {
                 url += `&f_cats=${fcats}`
@@ -646,6 +651,15 @@ class Ehentai extends ComicSource {
                     "full color-全彩",
                 ],
                 label: "Common Tags",
+                default: [],
+            },
+            {
+                type: "multi-select",
+                options: [
+                    "anthology-多作者合志",
+                    "advertisement-外部广告",
+                ],
+                label: "Exclude",
                 default: [],
             },
         ],
@@ -1597,6 +1611,7 @@ class Ehentai extends ComicSource {
             "Min Stars": "最少星星",
             "Language": "语言",
             "Common Tags": "常用标签",
+            "Exclude": "屏蔽",
             "H@H Original": "H@H 原版",
             "H@H 800x": "H@H 800x",
             "H@H 1280x": "H@H 1280x", 
@@ -1635,6 +1650,7 @@ class Ehentai extends ComicSource {
             "Min Stars": "最少星星",
             "Language": "語言",
             "Common Tags": "常用標籤",
+            "Exclude": "遮蔽",
             "H@H Original": "H@H 原版",
             "H@H 800x": "H@H 800x",
             "H@H 1280x": "H@H 1280x",
@@ -1673,6 +1689,7 @@ class Ehentai extends ComicSource {
             "Min Stars": "Min Stars",
             "Language": "Language",
             "Common Tags": "Common Tags",
+            "Exclude": "Exclude",
             "H@H Original": "H@H Original",
             "H@H 800x": "H@H 800x",
             "H@H 1280x": "H@H 1280x",

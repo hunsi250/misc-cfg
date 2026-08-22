@@ -1036,7 +1036,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.14";
+  version = "1.1.15";
 
   minAppVersion = "1.4.6";
 
@@ -1336,7 +1336,7 @@ class Hitomi extends ComicSource {
       // 统一语法转换: artist:"tebasaki nobuo" → artist:tebasaki_nobuo (去引号, 空格→下划线)
       const _p = this.parseSearchSyntax(keyword || "");
       let _term = _p.plain;
-      const _map = { artist: "artist", parody: "series", tag: "tag", language: "language", group: "artist", character: "character" };
+      const _map = { artist: "artist", parody: "series", tag: "tag", language: "language", group: "group", character: "character" };
       for (const _f of Object.keys(_p.fields)) {
         const _pf = _map[_f] || _f;
         _term += (_term ? " " : "") + _p.fields[_f].map(v => _pf + ":" + v.replace(/\s+/g, "_")).join(" ");

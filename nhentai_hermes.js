@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.18"
+    version = "1.1.19"
 
     minAppVersion = "1.0.0"
 
@@ -871,6 +871,7 @@ class Nhentai extends ComicSource {
                 type: "multi-select",
                 options: [
                     "anthology-多作者合志",
+                    "goudoushi-合同志",
                     "advertisement-外部广告",
                 ],
                 label: "Exclude",

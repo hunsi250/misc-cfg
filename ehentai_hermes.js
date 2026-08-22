@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.16"
+    version = "1.2.17"
 
     minAppVersion = "1.5.3"
 
@@ -657,6 +657,7 @@ class Ehentai extends ComicSource {
                 type: "multi-select",
                 options: [
                     "anthology-多作者合志",
+                    "goudoushi-合同志",
                     "advertisement-外部广告",
                 ],
                 label: "Exclude",

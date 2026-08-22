@@ -1037,7 +1037,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.21";
+  version = "1.1.22";
 
   minAppVersion = "1.4.6";
 
@@ -1507,6 +1507,7 @@ class Hitomi extends ComicSource {
         type: "multi-select",
         options: [
           "anthology-多作者合志",
+          "goudoushi-合同志",
           "advertisement-外部广告",
         ],
         label: "Exclude",

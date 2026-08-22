@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.19"
+    version = "1.2.20"
 
     minAppVersion = "1.5.3"
 
@@ -560,7 +560,7 @@ class Ehentai extends ComicSource {
             const LOOSE = "japanese_loose";
             if (langs.includes(LOOSE)) {
                 if (!keyword.includes("-language:")) {
-                    keyword += ` -language:english -language:chinese -language:korean -language:french -language:german -language:spanish -language:italian -language:portuguese -language:russian -language:thai -language:vietnamese -language:indonesian -language:polish -language:dutch -language:turkish -language:arabic -language:latin -language:other`;
+                    keyword += ` -language:english -language:chinese -language:korean -language:french -language:german -language:spanish -language:italian -language:portuguese -language:russian -language:thai -language:vietnamese -language:indonesian -language:polish -language:dutch -language:turkish -language:arabic -language:latin`;
                 }
             } else if (langs.length && !keyword.includes("language:")) {
                 keyword += ` ${langs.map(l => `language:${l}`).join("$")}`;

@@ -1036,7 +1036,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.15";
+  version = "1.1.16";
 
   minAppVersion = "1.4.6";
 
@@ -1574,6 +1574,7 @@ class Hitomi extends ComicSource {
       if ("type" in data && data.type) tags.set("type", [data.type]);
       if (data.groups.length) tags.set("groups", data.groups);
       if (data.artists.length) tags.set("artists", data.artists);
+      else if (data.groups.length) tags.set("artists", data.groups);
       if ("language" in data && data.language)
         tags.set("语言", [this.langText(data.language)]);
       if (data.series.length) tags.set("series", data.series);
@@ -1598,6 +1599,7 @@ class Hitomi extends ComicSource {
 
       return new ComicDetails({
         title: data.title,
+        subTitle: (data.artists.length ? data.artists : data.groups).join(", "),
         cover: get_thumbnail_url_from_hash(data.thumbnail_hash, true),
         description: _desc,
         tags,

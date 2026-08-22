@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.17"
+    version = "1.2.18"
 
     minAppVersion = "1.5.3"
 
@@ -554,8 +554,16 @@ class Ehentai extends ComicSource {
             for(let c of category) {
                 fcats -= 1 << Number(c)
             }
-            if(language && !keyword.includes("language:")) {
-                keyword += ` language:${language}`
+            let langs = [];
+            try { langs = JSON.parse(language ?? "[]"); } catch(e) { langs = []; }
+            if (typeof langs === "string") langs = [langs];
+            const LOOSE = "japanese_loose";
+            if (langs.includes(LOOSE)) {
+                if (!keyword.includes("-language:")) {
+                    keyword += ` -language:english -language:chinese -language:korean -language:french -language:german -language:spanish -language:italian -language:russian -language:portuguese`;
+                }
+            } else if (langs.length && !keyword.includes("language:")) {
+                keyword += ` ${langs.map(l => `language:${l}`).join("$")}`;
             }
             let commonTags = [];
             try { commonTags = JSON.parse(options[3] ?? "[]"); } catch(e) { commonTags = []; }
@@ -628,18 +636,16 @@ class Ehentai extends ComicSource {
                 label: "Min Stars",
             },
             {
-                // type: select, multi-select, dropdown
-                type: "dropdown",
-                // For a single option, use `-` to separate the value and text, left for value, right for text
+                type: "multi-select",
                 options: [
-                    "-<none>",
-                    "chinese-Chinese",
-                    "english-English",
-                    "japanese-Japanese",
-                    "russian-Russian",
+                    "chinese-中文",
+                    "english-英语",
+                    "japanese-日语",
+                    "japanese_loose-日语+",
+                    "russian-俄语",
                 ],
-                // option label
                 label: "Language",
+                default: [],
             },
             {
                 type: "multi-select",

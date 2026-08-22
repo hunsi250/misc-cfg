@@ -1037,7 +1037,7 @@ class Hitomi extends ComicSource {
   // unique id of the source
   key = "hitomi_hermes";
 
-  version = "1.1.18";
+  version = "1.1.19";
 
   minAppVersion = "1.4.6";
 
@@ -1573,9 +1573,10 @@ class Hitomi extends ComicSource {
 
       const tags = new Map();
       if ("type" in data && data.type) tags.set("type", [data.type]);
-      if (data.groups.length) tags.set("groups", data.groups);
-      const _authorMerged = [...data.artists, ...data.groups];
-      if (_authorMerged.length) tags.set("artists", [_authorMerged.join(", ")]);
+      const _authorTags = [];
+      for (const a of data.artists) _authorTags.push("artist: " + a);
+      for (const g of data.groups) _authorTags.push("group: " + g);
+      if (_authorTags.length) tags.set("作者", _authorTags);
       if ("language" in data && data.language)
         tags.set("语言", [this.langText(data.language)]);
       if (data.series.length) tags.set("series", data.series);
@@ -1655,6 +1656,15 @@ class Hitomi extends ComicSource {
       };
     },
     onClickTag: (namespace, tag) => {
+      const authorMatch = /^(artist|group)\s*:\s*(.+)$/i.exec(tag);
+      if (authorMatch) {
+        return {
+          page: "search",
+          attributes: {
+            keyword: `${authorMatch[1].toLowerCase()}:${authorMatch[2].trim().replaceAll(" ", "_")}`,
+          },
+        };
+      }
       let fixedNamespace = undefined;
       switch (namespace) {
         case "type":

@@ -45,7 +45,7 @@ class Ehentai extends ComicSource {
     // unique id of the source
     key = "ehentai_hermes"
 
-    version = "1.2.13"
+    version = "1.2.14"
 
     minAppVersion = "1.5.3"
 
@@ -786,6 +786,8 @@ class Ehentai extends ComicSource {
             }
 
             let tags = new Map();
+            let _artists = [];
+            let _groups = [];
             for(let tr of document.querySelectorAll("div#taglist > table > tbody > tr")) {
                 let key = tr.children[0].text.substring(0, tr.children[0].text.length - 1);
                 let vals = tr.children[1].children.map((e) =>
@@ -798,6 +800,8 @@ class Ehentai extends ComicSource {
                     key = "语言";
                     vals = vals.map((v) => this.langText(v));
                 }
+                if (key === "artist") { _artists = vals; continue; }
+                if (key === "group") { _groups = vals; continue; }
                 tags.set(key, vals)
             }
 
@@ -851,10 +855,10 @@ class Ehentai extends ComicSource {
             if(subtitle != null && subtitle.trim() === "") {
                 subtitle = null;
             }
-            let _artists = tags.get("artist") || [];
-            let _groups = tags.get("group") || [];
-            let _authorMerged = [..._artists, ..._groups];
-            if (_authorMerged.length) tags.set("artist", [_authorMerged.join(", ")]);
+            let _authorTags = [];
+            for (let a of _artists) _authorTags.push("artist: " + a);
+            for (let g of _groups) _authorTags.push("group: " + g);
+            if (_authorTags.length) tags.set("作者", _authorTags);
             let comments = this.comic.parseComments(document)
 
             let _lang = (tags.get("语言") || [])[0] || ""
@@ -1449,6 +1453,16 @@ class Ehentai extends ComicSource {
          * @returns {{action: string, keyword: string, param: string?}}
          */
         onClickTag: (namespace, tag) => {
+            const authorMatch = /^(artist|group)\s*:\s*(.+)$/i.exec(tag);
+            if (authorMatch) {
+                let name = authorMatch[2].trim();
+                if (name.includes(' ')) name = `"${name}"`;
+                return {
+                    action: 'search',
+                    keyword: `${authorMatch[1].toLowerCase()}:${name}`,
+                    param: null,
+                };
+            }
             if (namespace == "Category") {
                 const categories = ["misc", "doujinshi", "manga", "artist cg", "game cg", "image set", "cosplay", "asian porn", "non-h", "western"];
                 return {

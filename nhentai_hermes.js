@@ -28,7 +28,7 @@ class Nhentai extends ComicSource {
     // unique id of the source
     key = "nhentai_hermes"
 
-    version = "1.1.15"
+    version = "1.1.16"
 
     minAppVersion = "1.0.0"
 
@@ -915,6 +915,13 @@ class Nhentai extends ComicSource {
          * tag 点击 → 打开搜索结果页 (会记录搜索历史)
          */
         onClickTag: (namespace, tag) => {
+            const authorMatch = /^(artist|group)\s*:\s*(.+)$/i.exec(tag);
+            if (authorMatch) {
+                return {
+                    action: 'search',
+                    keyword: `${authorMatch[1].toLowerCase()}:${authorMatch[2].trim()}`,
+                }
+            }
             const nsMap = {
                 "语言": "language",
                 "Artists": "artist",
@@ -952,8 +959,8 @@ class Nhentai extends ComicSource {
                 let data = JSON.parse(apiRes.body)
 
                 let title = data?.title?.pretty || data?.title?.english || String(id)
-                let englishTitle = data?.title?.english || ""
-                let subtitle = englishTitle && englishTitle !== title ? englishTitle : ""
+                let japaneseTitle = data?.title?.japanese || ""
+                let subtitle = japaneseTitle && japaneseTitle !== title ? japaneseTitle : ""
                 let cover = this.toAbsoluteMediaUrl(data?.cover?.path || data?.thumbnail?.path || "", true)
                 
                 let tags = new Map();
@@ -972,6 +979,7 @@ class Nhentai extends ComicSource {
                     // 保存 tag id，给后面的分类搜索使用
                         this.tagIdCache[cacheKey] = tag.id;
                     }
+                    if (namespace === "artist" || namespace === "group") continue;
                     let displayNamespace = this.tagNamespace(tag.type);
                     if (!tags.has(displayNamespace)) {
                             tags.set(displayNamespace, [])
@@ -997,8 +1005,10 @@ class Nhentai extends ComicSource {
 
                 let related = (data.related || []).map(e => this.parseComicFromApi(e))
 
-                let _authorMerged = [..._artists, ..._groups]
-                if (_authorMerged.length) tags.set("Artists", [_authorMerged.join(", ")])
+                let _authorTags = []
+                for (let a of _artists) _authorTags.push("artist: " + a)
+                for (let g of _groups) _authorTags.push("group: " + g)
+                if (_authorTags.length) tags.set("作者", _authorTags)
                 let _lang = (tags.get("语言") || [])[0] || ""
                 let _pages = data?.num_pages || 0
                 let _desc = ""
